@@ -23,5 +23,9 @@ Auth::routes();
 //get = specific function in controller
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
+
 //resource = used all function
-Route::resource('room', App\Http\Controllers\RoomController::class);
+Route::middleware(['auth'])->group(function () {
+    Route::resource('room', App\Http\Controllers\RoomController::class);
+    Route::resource('booking', App\Http\Controllers\BookingController::class);
+});

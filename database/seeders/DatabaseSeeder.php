@@ -25,5 +25,6 @@ class DatabaseSeeder extends Seeder
         ]);
         // \App\Models\User::factory(10)->create();
         \App\Models\Room::factory(20)->create();
+        \App\Models\Booking::factory(20)->create();
     }
 }
