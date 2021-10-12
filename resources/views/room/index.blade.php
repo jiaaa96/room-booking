@@ -8,6 +8,30 @@
                 <div class="card-header">Rooms</div>
 
                 <div class="card-body">
+                    <div class="mb-3"> 
+                        <form action="{{route('room.index')}}" method="GET"> 
+                            <div class="form-group row">
+                                <div class="col-md-6">
+                                    <label for="name">Name</label>
+                                    <input type="text" class="form-control" id="name" name="name" value="{{request()->query('name')}}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="room_category_id">Room Category</label>
+                                    <select class="custom-select" id="room_category_id" name="room_category_id">
+                                        <option value="">Choose..</option>
+                                        @foreach ($room_categories as $room_category)
+                                        <option value="{{ $room_category->id }}"
+                                            {{ $room_category->id == request()->query('room_category_id') ? 'selected' : '' }}>
+                                            {{ $room_category->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                                <button type="submit" class="btn btn-info">Search</button>
+                                <a href="{{route('room.index')}}" class="btn btn-danger">Reset</a>
+                        </form>
+                    </div>
+
                     <table class="table">
                       <thead>
                           <tr>
@@ -43,7 +67,7 @@
                   {{ $rooms->links() }}
 
                   <a href="{{route('room.create')}}" class="btn btn-primary">Add</a>
-                  </div>
+                </div>
             </div>
         </div>
     </div>
