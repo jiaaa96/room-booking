@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,4 +20,8 @@ Route::get('/', function () {
 
 Auth::routes();
 
+//get = specific function in controller
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+//resource = used all function
+Route::resource('room', App\Http\Controllers\RoomController::class);

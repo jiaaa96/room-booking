@@ -8,4 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Room extends Model
 {
     use HasFactory;
+
+  //  protected $fillable = ['name', '...'];
+
+    protected $guarded = [];
+
+    public function room_category()
+    {
+        return $this->belongsTo(RoomCategory::class);
+    }
 }

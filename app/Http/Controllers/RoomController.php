@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Room;
+use App\Models\RoomCategory;
 use Illuminate\Http\Request;
 
 class RoomController extends Controller
@@ -14,7 +15,15 @@ class RoomController extends Controller
      */
     public function index()
     {
-        //
+        //with ->(to link relationship)
+        $rooms = Room::with('room_category')
+            ->where('enabled', 1)
+            ->orderBy('updated_at', 'desc')
+            ->paginate(5);
+
+        return view('room.index', [
+            'rooms' => $rooms 
+        ]);
     }
 
     /**
@@ -25,6 +34,10 @@ class RoomController extends Controller
     public function create()
     {
         //
+        return view('room.edit', [
+            'room' => new Room, 
+            'room_categories' => RoomCategory::where('enabled', 1)->get()
+        ]);
     }
 
     /**
@@ -35,7 +48,21 @@ class RoomController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        //to save data create
+        $request->validate([
+            'name' => ['required', 'max:255'],
+            'capacity' => ['required', 'max:4'],
+            'room_category_id' => ['required'],
+        ]);
+
+        Room::create([
+            'name'=>$request->name,
+            'capacity'=>$request->capacity,
+            'room_category_id'=>$request->room_category_id,
+            'user_id'=>auth()->id(),
+        ]);
+
+        return redirect()->route('room.index')->with('success', 'Room created.');
     }
 
     /**
@@ -57,7 +84,13 @@ class RoomController extends Controller
      */
     public function edit(Room $room)
     {
-        //
+        //edit data
+
+        return view('room.edit', [
+            'room' => $room,
+            'room_categories' => RoomCategory::where('enabled', 1)->get()
+        ]);
+
     }
 
     /**
@@ -69,7 +102,33 @@ class RoomController extends Controller
      */
     public function update(Request $request, Room $room)
     {
-        //
+        // update data
+        //dd($request->all()); to dump data
+
+        $request->validate([
+            'name' => ['required', 'max:255'],
+            'capacity' => ['required', 'max:4'],
+            'room_category_id' => ['required'],
+        ], 
+
+        //untuk custom error
+        [
+            'name.required' => 'The :attribute is required.',
+            'name.max' => 'The :attribute may not be greater than :max characters.',
+            'capacity.required' => 'The :attribute is required.',
+            'capacity.max' => 'The :attribute may not be greater than :max characters.',
+            'room_category_id.required' => 'The :attribute is required.',
+        ]);
+
+        $room->update([
+            'name' => $request->name,
+            'capacity' => $request->capacity,
+            'user_id' => auth()->id(),
+            'room_category_id' => $request->room_category_id,
+        ]); // set mass assignment
+
+        return redirect()->route('room.index')->with('success', 'Room updated.');
+
     }
 
     /**
@@ -80,6 +139,9 @@ class RoomController extends Controller
      */
     public function destroy(Room $room)
     {
-        //
+        //for delete function
+        $room->delete();
+
+        return redirect()->route('room.index')->with('success', 'Room deleted.');
     }
 }
