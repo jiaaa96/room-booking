@@ -31,7 +31,7 @@ class BookingController extends Controller
                     'title' => $booking->applicant,
                     'start' => $booking->start_date,
                     'end' => $booking->end_date,
-                    'url' => route('booking.edit', $booking),
+                    'url' => route('booking.show', $booking),
                     'color' => $booking->booking_status->color
 
                 ];
@@ -100,7 +100,9 @@ class BookingController extends Controller
      */
     public function show(Booking $booking)
     {
-        //
+        return view('booking.show', [
+            'booking' => $booking->load('booking_status', 'room')
+        ]);
     }
 
     /**

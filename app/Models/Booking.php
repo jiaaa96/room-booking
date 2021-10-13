@@ -23,6 +23,11 @@ class Booking extends Model
         return $this->belongsTo(BookingStatus::class);
     }
 
+    public function room()
+    {
+        return $this->belongsTo(Room::class);
+    }
+
     //accessors
     public function getStartDateFormattedAttribute()
     {
