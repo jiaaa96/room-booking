@@ -9,6 +9,8 @@ use Illuminate\Support\Str;
 use App\Models\RoomCategory;
 use Illuminate\Http\Request;
 use App\Models\BookingStatus;
+use App\Notifications\BookingStatusChanged;
+use Illuminate\Support\Facades\Notification;
 
 class BookingController extends Controller
 {
@@ -150,7 +152,11 @@ class BookingController extends Controller
             'room_id' => $request->room_id,
             'booking_status_id' => $request->booking_status_id,
         ]); // set mass assignment
-
+        
+        if ($booking->wasChanged('booking_status_id')){
+            Notification::send($booking->user, new BookingStatusChanged($booking)); 
+        }
+        
         return redirect()->route('booking.index')->with('success', 'Booking updated.');
     }
 

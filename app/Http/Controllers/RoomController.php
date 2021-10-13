@@ -22,7 +22,7 @@ class RoomController extends Controller
             ->where('enabled', 1)
             ->when($request->name, function($query) use ($request) {
                 return $query->where('name', 'LIKE', '%'.$request->name.'%');
-            })
+            }) // untuk search
             ->when($request->room_category_id, function($query) use ($request) {
                 return $query->where('room_category_id', $request->room_category_id);
             })

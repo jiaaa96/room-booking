@@ -26,7 +26,7 @@
             <div class="mx-4">
                 <div class="row justify-content-center py-4">
                     <div class="col-md-12">
-                         {{-- <x-alert /> --}}
+                         <x-alert />
                     </div>
                     @auth
                     <div class="col-md-2">
