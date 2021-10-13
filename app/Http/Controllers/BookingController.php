@@ -19,7 +19,28 @@ class BookingController extends Controller
      */
     public function index()
     {
-        return view('booking.index');
+        
+        $bookings = Booking::query()
+            ->with('booking_status') // eager loading(load siap siap) vs lazy loading 
+            ->where('enabled', 1)
+            ->where('user_id', auth()->id())
+            ->get()
+            ->transform(function($booking) {
+                return [
+                    'id' => $booking->id,
+                    'title' => $booking->applicant,
+                    'start' => $booking->start_date,
+                    'end' => $booking->end_date,
+                    'url' => route('booking.edit', $booking),
+                    'color' => $booking->booking_status->color
+
+                ];
+            });
+
+        return view('booking.index', [
+            'bookings' => $bookings,
+            'booking_statuses' => BookingStatus::all()
+        ]);
     }
 
     /**

@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Booking extends Model
 {
     use HasFactory;
-
+    
+    //eloquent ORM == object relationship management
     protected $guarded = [];
     
     protected $casts = [
@@ -16,6 +17,13 @@ class Booking extends Model
         'end_date' => 'datetime'
     ];
 
+    //relatonship
+    public function booking_status()
+    {
+        return $this->belongsTo(BookingStatus::class);
+    }
+
+    //accessors
     public function getStartDateFormattedAttribute()
     {
         return $this->start_date ? $this->start_date->format('Y-m-d\TH:i') : null;
