@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\MediaLibrary\HasMedia;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Booking extends Model
+class Booking extends Model implements HasMedia
 {
-    use HasFactory;
+    use HasFactory, InteractsWithMedia;
     
     //eloquent ORM == object relationship management
     protected $guarded = [];
@@ -50,4 +52,15 @@ class Booking extends Model
     {
         return $this->end_date ? $this->end_date->format('Y-m-d\TH:i') : null;
     }
+
+    public function getSupportingDocumentAttachmentAttribute()
+    {
+        return $this->getFirstMedia()
+            ? (object) collect([
+                'name' => $this->getFirstMedia()->file_name,
+                'url' => $this->getFirstMedia()->getUrl()
+            ])->all()
+            : null;
+    }
+
 }

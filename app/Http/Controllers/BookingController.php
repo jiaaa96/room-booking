@@ -36,7 +36,7 @@ class BookingController extends Controller
                     'start' => $booking->start_date,
                     'end' => $booking->end_date,
                     'url' => route('booking.show', $booking),
-                    'color' => $booking->booking_status->color
+                    'color' => optional($booking->booking_status)->color
 
                 ];
             });
@@ -77,7 +77,7 @@ class BookingController extends Controller
             'start_date' => ['required', 'date', 'after_or_equal:now'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
             'room_id' => ['required', 'numeric'],
-
+            'supporting_document_attachment' => ['mimes:pdf', 'max:1024'],
         ]); 
 
         if ($bookingService->isRoomTaken($request->all())) {
@@ -93,7 +93,7 @@ class BookingController extends Controller
         }
 
 
-        Booking::create([
+        $booking = Booking::create([
             'applicant' => $request->applicant,
             'purpose' => $request->purpose,
             'notes' => $request->notes,
@@ -105,6 +105,8 @@ class BookingController extends Controller
             'user_id' => auth()->id(),
             'uuid' => Str::uuid()
         ]); // set mass assignment
+
+        $this->uploadFile($request, $booking, 'supporting_document_attachment');
 
         return redirect()->route('booking.index')->with('success', 'Booking created.');
     }
@@ -148,6 +150,8 @@ class BookingController extends Controller
      */
     public function update(Request $request, Booking $booking)
     {
+        
+
         $request->validate([
             'applicant' => ['required', 'max:255'],
             'purpose' => ['required', 'max:255'],
@@ -156,7 +160,8 @@ class BookingController extends Controller
             'start_date' => ['required', 'date', 'after_or_equal:now'],
             'end_date' => ['required', 'date'],
             'room_id' => ['required', 'numeric'],
-            'booking_status_id' => ['required', 'numeric'],
+            'booking_status_id' => ['nullable', 'numeric'],
+            'supporting_document_attachment' => ['mimes:pdf', 'max:1024'],
         ]); 
 
         $booking->update([
@@ -167,9 +172,11 @@ class BookingController extends Controller
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
             'room_id' => $request->room_id,
-            'booking_status_id' => $request->booking_status_id,
+            'booking_status_id' => $request->booking_status_id ?? 1,
         ]); // set mass assignment
         
+        $this->uploadFile($request, $booking, 'supporting_document_attachment');
+
         if ($booking->wasChanged('booking_status_id')){
             Notification::send($booking->user, new BookingStatusChanged($booking)); 
         }
@@ -187,4 +194,15 @@ class BookingController extends Controller
     {
         //
     }
+
+    public function uploadFile($request, $item, $attachment)
+    {
+        if ($request->hasFile($attachment)) {
+            if ($item->getFirstMedia()) {
+                $item->getFirstMedia()->delete();
+            }
+            $item->addMediaFromRequest($attachment)->toMediaCollection();
+        }
+    }
+
 }

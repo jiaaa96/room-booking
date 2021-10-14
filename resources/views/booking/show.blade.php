@@ -32,6 +32,25 @@
         </div>
 
         <div class="form-group row">
+          <label class="col-sm-2 col-form-label">Supporting Document</label>
+          <div class="col-sm-10">
+              @if ($booking->supporting_document_attachment)
+              <p class="my-2">
+                  <a href="{{ $booking->supporting_document_attachment->url }}" target="_blank" class="btn btn-primary btn-sm">
+                      <i class="ti ti-download mr-1"></i>
+                      {{ $booking->supporting_document_attachment->name }}
+                  </a>
+              </p>
+              @else
+              <p class="my-2 text-secondary">
+                  No attachment
+              </p>
+              @endif
+          </div>
+        </div>
+        
+
+        <div class="form-group row">
           <label for="start_date" class="col-sm-2 col-form-label">Start At</label>
           <div class="col-sm-10">
             <p>{{ $booking->start_date->format('d/m/Y g:i A') }}</p>
