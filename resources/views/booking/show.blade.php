@@ -61,7 +61,11 @@
 
         <div class="d-flex justify-content-end">
             <a href="{{ url()->previous() }}" class="btn btn-link mr-2">Cancel</a>
+            @if ($booking->booking_status_id === 1)
+            @can ('edit_booking')
             <a href="{{ route('booking.edit', $booking) }}" class="btn btn-primary">Edit</a>
+            @endcan
+            @endif
         </div>
     </div>
 </div>

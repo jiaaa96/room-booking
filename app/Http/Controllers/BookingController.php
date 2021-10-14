@@ -9,7 +9,9 @@ use Illuminate\Support\Str;
 use App\Models\RoomCategory;
 use Illuminate\Http\Request;
 use App\Models\BookingStatus;
+use Illuminate\Support\Facades\Gate;
 use App\Notifications\BookingStatusChanged;
+use App\Services\BookingService;
 use Illuminate\Support\Facades\Notification;
 
 class BookingController extends Controller
@@ -65,7 +67,7 @@ class BookingController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, BookingService $bookingService)
     {
         $request->validate([
             'applicant' => ['required', 'max:255'],
@@ -77,6 +79,19 @@ class BookingController extends Controller
             'room_id' => ['required', 'numeric'],
 
         ]); 
+
+        if ($bookingService->isRoomTaken($request->all())) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'This room is not available based on selected dates');
+        }
+
+        if ($bookingService->isWithinCapacity($request->all())) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', "Your total participant is more than room's capacity");
+        }
+
 
         Booking::create([
             'applicant' => $request->applicant,
@@ -115,6 +130,8 @@ class BookingController extends Controller
      */
     public function edit(Booking $booking)
     {
+        Gate::authorize('update', $booking);
+
         return view('booking.edit', [
             'booking' => $booking,
             'booking_statuses' => BookingStatus::where('enabled', 1)->get(),

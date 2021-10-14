@@ -17,6 +17,12 @@ class Booking extends Model
         'end_date' => 'datetime'
     ];
 
+    //nak keluarkan id random 
+    public function getRouteKeyName()
+    {
+        return 'uuid';
+    }
+
     //relatonship
     public function booking_status()
     {
